@@ -1,0 +1,423 @@
+\documentclass{beamer}
+%\usepackage[bars]{beamerthemetree} % Beamer Theme v 2.2
+\usetheme{boxes} % Beamer theme
+\usecolortheme{whale} % Beamer color theme
+
+\usepackage[boldfont,slantfont]{xeCJK}
+\usepackage{fontspec}
+\setmainfont{DejaVu Serif}
+\setsansfont{DejaVu Sans}
+\setmonofont{DejaVu Sans Mono}%{Monaco}
+\setCJKmainfont{文泉驿正黑}
+\setCJKsansfont{文泉驿微米黑}
+\setCJKmonofont{文泉驿等宽微米黑}
+\setCJKfamilyfont{tt}{Monaco}
+
+
+\usepackage{color}
+\definecolor{listinggray}{gray}{0.9} 
+\usepackage{xcolor}
+
+\usepackage{listings}
+\usepackage{hyperref}
+
+\lstset{showstringspaces=false}
+
+\title{SQLAlchemy 介绍}
+\author[刘鑫]{刘鑫 <mars.liu@tratao.com>}
+\institute{Python 最好的数据库访问工具}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\section{SQLAlchemy 简介}
+
+\begin{frame}
+  \begin{center}
+    \Huge{什么是 SQLAlchemy ？}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{什么是 SQLAlchemy？}
+  \begin{center}
+    \huge{数据库访问工具}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{什么是 SQLAlchemy？}
+  \begin{center}
+    \huge{DBAPI++}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{什么是 SQLAlchemy？}
+  \begin{center}
+    \huge{全功能 ORM}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{什么是 SQLAlchemy？}
+  \begin{center}
+    \huge{广泛支持主流数据库}
+  \end{center}
+\end{frame}
+
+
+\begin{frame}
+  \frametitle{什么是 SQLAlchemy？}
+  \begin{center}
+    \huge{宽容的支持各种不同的设计}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \begin{center}
+    \Huge{第一个例子}
+  \end{center}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{Engine 的概念}
+  \begin{lstlisting}[language=python]
+#!/usr/bin/env python
+
+import sqlalchemy as sa
+
+engine = sa.create_engine(
+    "sqlite:///:memory:", echo=True)
+print engine.table_names()
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{输出显示了操作内容}
+  \begin{lstlisting}
+2013-11-26 14:44:08,123 INFO 
+  sqlalchemy.engine.base.Engine 
+  SELECT name FROM  (SELECT * 
+  FROM sqlite_master UNION ALL   
+  SELECT * FROM sqlite_temp_master) 
+  WHERE type='table' ORDER BY name 
+2013-11-26 14:44:08,123 INFO 
+  sqlalchemy.engine.base.Engine ()
+
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}
+  \frametitle{ORM and MetaData}
+  \begin{center}
+    \huge{演示 sample2.py }
+  \end{center}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{引入}
+  \begin{lstlisting}[language=Python]
+import sqlalchemy as sa
+from sqlalchemy.ext.declarative \
+    import declarative_base
+from sqlalchemy.orm import sessionmaker
+
+import datetime
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{环境初始化}
+  \begin{lstlisting}[language=python]
+engine = sa.create_engine(
+    "sqlite:///:memory:", echo=True)
+Base = declarative_base()
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{模型定义}
+  \begin{lstlisting}[language=python]
+class Note(Base):
+    __tablename__ = 'note'
+    id = sa.Column(sa.Integer, primary_key=True)
+    author = sa.Column(sa.String)
+    content = sa.Column(sa.String)
+    at = sa.Column(sa.TIMESTAMP, 
+        default=datetime.datetime.now)
+
+    def __repr__(self):
+        return (u"<Note(id=%s, author=',..."
+            self.id, self.author, self.content, 
+            self.at)).encode("utf-8")
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{绑定然后建立架构}
+  \begin{lstlisting}[language=python]
+Base.metadata.create_all(engine)
+
+Session = sessionmaker(bind=engine)
+session = Session()
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{数据写入}
+  \begin{lstlisting}[language=python]
+log = Note(author="mars.liu@tratao.com", 
+    content=u"编写 SQLAlchemy 教程")
+print log
+session.add(log)
+session.commit()
+print log
+  \end{lstlisting}
+\end{frame}
+
+\section{数据查询}
+\begin{frame}[containsverbatim]
+  \frametitle{查询}
+  \begin{lstlisting}[language=python]
+re = session.query(Note).filter_by( \
+   author="mars.liu@tratao.com").all()
+...
+re = session.query(Note.author, 
+    Note.at).all()
+...
+log3 = session.query(Note).get(log3.id)
+...
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{单对象更新}
+  \begin{lstlisting}[language=python]
+log3 = session.query(Note).get(log3.id)
+log3=session.merge(log3)
+session.commit()
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{单对象更新}
+  \begin{lstlisting}[language=python]
+log3 = session.query(Note).get(log3.id)
+log3=session.merge(log3)
+session.commit()
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{Update and Other}
+  \begin{lstlisting}[language=python]
+log3 = session.query(Note).get(log3.id)
+log3.author = "mars.liu@dwarf-artisan.com"
+log3.content += u"，对象更新"
+session.commit()
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{SQL 拼装}
+  \begin{lstlisting}[language=python]
+ins = Note.__table__.insert().values(
+    author='march.liu@gmail.com', 
+    content=u"SQL语句组合")
+print ins
+session.execute(ins)
+re = session.query(Note).all()
+print re 
+  \end{lstlisting}
+\end{frame}
+
+
+\begin{frame}[containsverbatim]
+  \frametitle{查询拼接}
+  \begin{lstlisting}
+log4 = session.query(Note).order_by(\
+    Note.id.desc()).first()
+
+log4.content += u"，数据已修改成功"
+session.commit()
+re = session.query(Note.id, 
+    Note.content).all()
+
+  \end{lstlisting}
+\end{frame}
+
+\section{概览}
+\begin{frame}
+  \frametitle{基本结构}
+  \begin{figure}
+    \centering
+    \includegraphics[bb=0 0 988 458,scale=.4]{struct.png}
+    \caption{基本结构 }
+    \label{fig:struct}
+  \end{figure}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Engine}
+  \begin{center}
+    \Large{连接数据库和模型}
+  \end{center}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{Engine}
+\Large{URL 连接模式：}
+  \begin{center}
+    postgresql://user:***@server/database
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Session}
+  \begin{center}
+    \Large{操作核心接口}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Session}
+  \begin{center}
+    \Large{事务封装}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Session}
+  \begin{center}
+    \Large{并发隔离}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Session}
+  \begin{center}
+    \Large{提供多样化的数据访问操作}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Session}
+  \begin{center}
+    \Large{平滑适配 ORM 到 SQL 操作的各种层级}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{MetaData 和 declarative\_base}
+  \begin{center}
+    \Large{数据库模型描述的核心组件}
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Mapper}
+  \begin{center}
+    \Large{支持数据库模型和业务模型间的复杂关系}
+  \end{center}
+\end{frame}
+
+\section{数据库特化支持}
+
+
+\section{框架支持}
+
+\begin{frame}[containsverbatim]
+  \frametitle{Web.py}
+  \begin{lstlisting}[language=python]
+from sqlalchemy.orm import scoped_session, sessionmaker
+...
+def load_sqla(handler):
+    web.ctx.orm = scoped_session(sessionmaker(bind=engine))
+    try:
+        return handler()
+    except web.HTTPError:
+       web.ctx.orm.commit()
+       raise
+    except:
+        web.ctx.orm.rollback()
+        raise
+    finally:
+        web.ctx.orm.commit()
+        #web.ctx.orm.expunge_all() 
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{tornado}
+  \begin{lstlisting}[language=python]
+from sqlalchemy.orm import scoped_session, sessionmaker
+from models import *  # import the engine to bind
+
+class Application(tornado.web.Application):
+def __init__(self):
+    ...
+    # Have one global connection.
+    self.db = scoped_session(\
+      sessionmaker(bind=engine))
+class BaseHandler(tornado.web.RequestHandler):
+    @property
+    def db(self):
+        return self.application.db
+    def get_current_user(self):
+        user_id = self.get_secure_cookie("user")
+        if not user_id: return None
+        return self.db.query(User).get(user_id)
+  \end{lstlisting}
+\end{frame}
+
+\section{并发优化}
+\begin{frame}[containsverbatim]
+  \frametitle{\href{https://bitbucket.org/zzzeek/green_sqla/src/2732bb7ea9d06b9d4a61e8cd587a95148ce2599b/green_sqla/psyco_gevent.py?at=default}{SQLAlchemy+Gevent}}
+  \begin{lstlisting}[language=python]
+def make_psycopg_green():
+    """Configure Psycopg to be used with gevent in non-blocking way."""
+    if not hasattr(extensions, 'set_wait_callback'):
+        raise ImportError(
+            "support for coroutines not available in this Psycopg version (%s)"
+            % psycopg2.__version__)
+
+    extensions.set_wait_callback(gevent_wait_callback)
+  \end{lstlisting}
+\end{frame}
+
+\begin{frame}[containsverbatim]
+  \frametitle{\href{https://bitbucket.org/zzzeek/green_sqla/src/2732bb7ea9d06b9d4a61e8cd587a95148ce2599b/green_sqla/psyco_gevent.py?at=default}{SQLAlchemy+Gevent}}
+  \begin{lstlisting}
+def gevent_wait_callback(conn, timeout=None):
+    """A wait callback useful to allow gevent to work with Psycopg."""
+    while 1:
+        state = conn.poll()
+        if state == extensions.POLL_OK:
+            break
+        elif state == extensions.POLL_READ:
+            wait_read(conn.fileno(), timeout=timeout)
+        elif state == extensions.POLL_WRITE:
+            wait_write(conn.fileno(), timeout=timeout)
+        else:
+            raise psycopg2.OperationalError(
+                "Bad result from poll: %r" % state)
+  \end{lstlisting}
+\end{frame}
+
+\section{结尾}
+\begin{frame}
+  \frametitle{谢谢大家，再见！}
+  \begin{center}
+    \Huge{Q\&A}
+  \end{center}
+  \begin{flushright}
+    Power by \LaTeX{}
+  \end{flushright}
+
+\end{frame}
+
+
+\end{document}
+
