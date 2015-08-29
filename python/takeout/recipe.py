@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import datetime
 import json
-import ditstance
+import distance
 from parsec import *
 
 def today():
@@ -21,7 +21,7 @@ def after_tommorrow():
 
 def request(recipe, word):
     content = recipe["content"]
-    return min(content, key=lambda item:ditstance.levenshtein(item[0], word)/float(len(item[0])))
+    return min(content, key=lambda item:distance.levenshtein(item[0], word)/float(len(item[0])))
 
 def order(content):
     st = BasicState(content)

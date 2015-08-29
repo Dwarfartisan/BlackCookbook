@@ -1,31 +1,31 @@
 #!/usr/bin/env python
 #coding:utf8
 
-def ditstance(source, target):
-    """ ditstance(source, target)->int return the levenshtein ditstance 
->>> ditstance("126.com", "127.com")
+def distance(source, target):
+    """ distance(source, target)->int return the levenshtein distance
+>>> distance("126.com", "127.com")
 1
->>> ditstance("127.com", "126.com")
+>>> distance("127.com", "126.com")
 1
->>> ditstance("hotmail.com", "hotmail.com")
+>>> distance("hotmail.com", "hotmail.com")
 0
->>> ditstance("", "")
+>>> distance("", "")
 0
->>> ditstance("sina.com", "")
+>>> distance("sina.com", "")
 8
->>> ditstance("", "gmail.com")
+>>> distance("", "gmail.com")
 9
->>> ditstance("sina.com", "sina.cn")
+>>> distance("sina.com", "sina.cn")
 2
->>> ditstance("qq.cn", "qq.com")
+>>> distance("qq.cn", "qq.com")
 2
->>> ditstance("139.com", ".139.com")
+>>> distance("139.com", ".139.com")
 1
->>> ditstance("qq.", "qq.com")
+>>> distance("qq.", "qq.com")
 3
->>> ditstance("gmail.com", ".gmail.com")
+>>> distance("gmail.com", ".gmail.com")
 1
->>> ditstance(".gmail.com", "gmail.com")
+>>> distance(".gmail.com", "gmail.com")
 1
     """
     src_length = len(source)+1
