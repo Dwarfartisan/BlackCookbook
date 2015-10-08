@@ -1,4 +1,5 @@
 test simple:
+===================================  
 A = (
     Node("start")
         .addkid(Node("meta")
