@@ -1,5 +1,13 @@
-import collections
 
+import collections
+    """
+    WHAT ACHIEVE:
+    find the edit distance between json-tree
+    TODO:
+    1.locate the diff part 
+    2.find the diff-detial refer to location
+
+    """
 try:
     import numpy as np
     zeros = np.zeros
