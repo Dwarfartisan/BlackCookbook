@@ -1,10 +1,10 @@
 use std::sync::Arc;
 
-fn make_counter() ->  Box< FnMut()-> Arc<i32>> {
+fn make_counter() ->  Box< FnMut()-> i32> {
     let mut count:Arc<i32> = Arc::new(0);
-    Box::new(move || -> Arc<i32> {
+    Box::new(move || -> i32 {
         *Arc::make_mut(&mut count) += 1;
-        let count = count.clone();
+        let count = *count;
         return count;
     })
 }
